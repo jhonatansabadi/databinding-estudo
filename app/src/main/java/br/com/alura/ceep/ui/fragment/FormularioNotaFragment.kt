@@ -57,6 +57,7 @@ class FormularioNotaFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         dataBinding = FormularioNotaBinding.inflate(inflater, container, false)
+        dataBinding.lifecycleOwner = this
         dataBinding.nota = notaData
         dataBinding.solicitaImagem = View.OnClickListener {
             solicitaImagem()
@@ -84,8 +85,8 @@ class FormularioNotaFragment : Fragment() {
     private fun temIdValido() = notaId != 0L
 
     private fun solicitaImagem() {
-        CarregaImagemDialog().mostra(requireContext(), notaData.imagemUrl.get() ?: "") { urlNova ->
-            notaData.imagemUrl.set(urlNova)
+        CarregaImagemDialog().mostra(requireContext(), notaData.imagemUrl.value ?: "") { urlNova ->
+            notaData.imagemUrl.postValue(urlNova)
         }
     }
 
