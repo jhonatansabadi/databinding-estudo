@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.ceep.BR
 import br.com.alura.ceep.R
+import br.com.alura.ceep.databinding.ItemNotaBinding
 import br.com.alura.ceep.model.Nota
 import br.com.alura.ceep.ui.extensions.carregaImagem
 import kotlinx.android.synthetic.main.item_nota.view.*
@@ -27,8 +28,7 @@ class ListaNotasAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflator = LayoutInflater.from(context)
-        val viewDataBinding =
-            DataBindingUtil.inflate<ViewDataBinding>(inflator, R.layout.item_nota, parent, false)
+        val viewDataBinding = ItemNotaBinding.inflate(inflator, parent, false)
         return ViewHolder(viewDataBinding)
     }
 
@@ -38,25 +38,26 @@ class ListaNotasAdapter(
         }
     }
 
-    inner class ViewHolder(private val dataBinding: ViewDataBinding) :
-        RecyclerView.ViewHolder(dataBinding.root) {
+    inner class ViewHolder(private val dataBinding: ItemNotaBinding) :
+        RecyclerView.ViewHolder(dataBinding.root), View.OnClickListener {
 
         private lateinit var nota: Nota
 
         init {
-            itemView.setOnClickListener {
-                if (::nota.isInitialized) {
-                    onItemClickListener(nota)
-                }
-            }
+            dataBinding.listener = this
         }
 
         fun vincula(nota: Nota) {
             this.nota = nota
-            dataBinding.setVariable(BR.nota, nota)
+            dataBinding.nota = nota
+        }
+
+        override fun onClick(v: View?) {
+            if (::nota.isInitialized) {
+                onItemClickListener(nota)
+            }
         }
     }
-
 }
 
 object DiffCallback : DiffUtil.ItemCallback<Nota>() {
@@ -67,9 +68,4 @@ object DiffCallback : DiffUtil.ItemCallback<Nota>() {
 
     override fun areContentsTheSame(oldItem: Nota, newItem: Nota) = oldItem == newItem
 
-}
-
-@BindingAdapter("carregaImagem")
-fun carregaImagemPorUrl(view: ImageView, url: String) {
-    view.carregaImagem(url)
 }
