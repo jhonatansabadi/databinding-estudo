@@ -62,6 +62,7 @@
             android:layout_width="0dp"
             android:layout_height="200dp"
             android:contentDescription="@string/imagem_da_nota"
+            android:onClick="@{solicitaImagem}"
             android:visibility="@{nota.imagemUrl.isEmpty ? View.GONE : View.VISIBLE}"
             app:carregaImagem="@{nota.imagemUrl}"
             app:layout_constraintEnd_toEndOf="parent"
@@ -70,6 +71,7 @@
             tools:src="@tools:sample/avatars" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:onClick="@{solicitaImagem}"
             android:id="@+id/formulario_nota_fab_adiciona_imagem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -88,6 +90,12 @@
         <variable
             name="nota"
             type="br.com.alura.ceep.model.Nota" />
+
+        <variable
+            name="solicitaImagem"
+            type="android.view.View.OnClickListener" />
+
+
     </data>
 
 </layout>
