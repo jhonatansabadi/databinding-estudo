@@ -16,6 +16,7 @@ import br.com.alura.ceep.databinding.FormularioNotaBinding
 import br.com.alura.ceep.model.Nota
 import br.com.alura.ceep.repository.Falha
 import br.com.alura.ceep.repository.Sucesso
+import br.com.alura.ceep.ui.databinding.NotaData
 import br.com.alura.ceep.ui.dialog.CarregaImagemDialog
 import br.com.alura.ceep.ui.extensions.carregaImagem
 import br.com.alura.ceep.ui.viewmodel.AppBar
@@ -38,7 +39,10 @@ class FormularioNotaFragment : Fragment() {
     private val controlador by lazy {
         findNavController()
     }
-    private lateinit var notaEncontrada: Nota
+
+    private val notaData by lazy {
+        NotaData()
+    }
 
     private lateinit var dataBinding: FormularioNotaBinding
 
@@ -53,6 +57,7 @@ class FormularioNotaFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         dataBinding = FormularioNotaBinding.inflate(inflater, container, false)
+        dataBinding.nota = notaData
         dataBinding.solicitaImagem = View.OnClickListener {
             solicitaImagem()
         }
@@ -69,29 +74,20 @@ class FormularioNotaFragment : Fragment() {
         if (temIdValido()) {
             viewModel.buscaPorId(notaId).observe(this, Observer {
                 it?.let { notaEncontrada ->
-                    this.dataBinding.nota = notaEncontrada
-                    inicializaNota(notaEncontrada)
+                    notaData.atualiza(notaEncontrada)
                     appViewModel.temComponentes = appBarParaEdicao()
                 }
             })
-        } else {
-            inicializaNota(Nota())
         }
     }
 
     private fun temIdValido() = notaId != 0L
 
     private fun solicitaImagem() {
-        CarregaImagemDialog().mostra(requireContext(), notaEncontrada.imagemUrl) { urlNova ->
-            notaEncontrada.imagemUrl = urlNova
-            dataBinding.nota = notaEncontrada
+        CarregaImagemDialog().mostra(requireContext(), notaData.imagemUrl.get() ?: "") { urlNova ->
+            notaData.imagemUrl.set(urlNova)
         }
     }
-
-    private fun inicializaNota(notaEncontrada: Nota) {
-        this.notaEncontrada = notaEncontrada
-    }
-
 
     private fun appBarParaEdicao() = ComponentesVisuais(appBar = AppBar(titulo = "Editando nota"))
 
@@ -113,9 +109,7 @@ class FormularioNotaFragment : Fragment() {
     }
 
     private fun criaNota(): Nota? {
-        return dataBinding.nota?.copy(
-            id = notaEncontrada.id
-        )
+        return notaData.paraNota()
     }
 
     private fun salva(notaNova: Nota) {
@@ -126,6 +120,5 @@ class FormularioNotaFragment : Fragment() {
             }
         })
     }
-
 }
 
